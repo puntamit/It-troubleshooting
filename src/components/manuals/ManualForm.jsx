@@ -93,9 +93,9 @@ const ManualForm = ({ manual, onSave, onCancel }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[95vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 border dark:border-slate-800">
                 {/* Header */}
-                <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
+                <div className="p-5 md:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
                     <div>
-                        <h2 className="text-2xl font-black text-slate-800 dark:text-white">
+                        <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white">
                             {isEditing ? 'แก้ไขคู่มือ' : 'สร้างคู่มือใหม่'}
                         </h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">กรอกข้อมูลให้ครบถ้วนเพื่อสร้างคู่มือที่มีคุณภาพ</p>
@@ -109,7 +109,7 @@ const ManualForm = ({ manual, onSave, onCancel }) => {
                 </div>
 
                 {/* Form Body */}
-                <form id="manual-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-8">
+                <form id="manual-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 md:p-8 space-y-6 md:space-y-8">
                     {error && (
                         <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
                             <AlertCircle size={20} />

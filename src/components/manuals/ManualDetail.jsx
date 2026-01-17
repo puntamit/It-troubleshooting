@@ -8,7 +8,7 @@ const ManualDetail = ({ manual, onClose }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 border dark:border-slate-800">
                 {/* Header */}
-                <div className="relative p-8 border-b border-slate-100 dark:border-slate-800 flex-shrink-0">
+                <div className="relative p-5 md:p-8 border-b border-slate-100 dark:border-slate-800 flex-shrink-0">
                     <button
                         onClick={onClose}
                         className="absolute right-6 top-6 p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all"
@@ -39,7 +39,7 @@ const ManualDetail = ({ manual, onClose }) => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-8 space-y-8">
+                <div className="flex-1 overflow-y-auto p-5 md:p-8 space-y-6 md:space-y-8">
                     <div className="prose prose-slate dark:prose-invert max-w-none">
                         <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed italic border-l-4 border-indigo-200 dark:border-indigo-900 pl-4">
                             {manual.description}
@@ -54,7 +54,7 @@ const ManualDetail = ({ manual, onClose }) => {
 
                         <div className="space-y-4">
                             {(manual.steps || []).sort((a, b) => a.step_order - b.step_order).map((step, index) => (
-                                <div key={step.id || index} className="flex flex-col sm:flex-row gap-6 p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 group hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all">
+                                <div key={step.id || index} className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 group hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all">
                                     <div className="flex-shrink-0 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-200 dark:shadow-none">
                                         {index + 1}
                                     </div>

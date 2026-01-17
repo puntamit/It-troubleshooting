@@ -7,6 +7,7 @@ import ManualCard from '../components/manuals/ManualCard';
 import ManualForm from '../components/manuals/ManualForm';
 import ManualDetail from '../components/manuals/ManualDetail';
 import { Link } from 'react-router-dom';
+import ConfirmationModal from '../components/modals/ConfirmationModal';
 
 const HomePage = () => {
     const { signOut, user, profile } = useAuth();
@@ -20,6 +21,13 @@ const HomePage = () => {
     const [fetchError, setFetchError] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [selectedManual, setSelectedManual] = useState(null);
+    const [confirmation, setConfirmation] = useState({
+        isOpen: false,
+        type: '', // 'logout' | 'delete'
+        id: null,
+        title: '',
+        message: ''
+    });
 
     useEffect(() => {
         fetchManuals();
@@ -161,9 +169,34 @@ const HomePage = () => {
         }
     };
 
-    const handleDeleteManual = async (id) => {
-        if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการลบคู่มือนี้? ข้อมูลทั้งหมดรวมถึงขั้นตอนการแก้ไขจะถูกลบถาวร')) return;
+    const handleDeleteManual = (id) => {
+        setConfirmation({
+            isOpen: true,
+            type: 'delete',
+            id: id,
+            title: 'ลบคู่มือ',
+            message: 'คุณแน่ใจหรือไม่ว่าต้องการลบคู่มือนี้? ข้อมูลทั้งหมดรวมถึงขั้นตอนการแก้ไขจะถูกลบถาวร'
+        });
+    };
 
+    const handleLogoutClick = () => {
+        setConfirmation({
+            isOpen: true,
+            type: 'logout',
+            title: 'ออกจากระบบ',
+            message: 'คุณต้องการออกจากระบบใช่หรือไม่?'
+        });
+    };
+
+    const handleConfirmAction = async () => {
+        if (confirmation.type === 'logout') {
+            await signOut();
+        } else if (confirmation.type === 'delete') {
+            await executeDeleteManual(confirmation.id);
+        }
+    };
+
+    const executeDeleteManual = async (id) => {
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Delete timeout: Operation took too long')), 5000)
         );
@@ -204,6 +237,9 @@ const HomePage = () => {
                         <h1 className="text-xl font-black text-slate-800 dark:text-white tracking-tight hidden sm:block">
                             IT TROUBLE<span className="text-indigo-600 underline decoration-indigo-200 dark:decoration-indigo-900 decoration-4 underline-offset-4">SHOOTER</span>
                         </h1>
+                        <h1 className="text-lg font-black text-slate-800 dark:text-white tracking-tight block sm:hidden">
+                            IT<span className="text-indigo-600">TS</span>
+                        </h1>
                     </div>
 
                     <div className="flex items-center gap-1.5 md:gap-4">
@@ -226,16 +262,12 @@ const HomePage = () => {
                             {isDarkMode ? <Sun size={22} /> : <Moon size={22} />}
                         </button>
 
-                        <div className="text-right hidden md:block mr-4">
+                        <div className="text-right hidden lg:block mr-4">
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Logged in as</p>
                             <p className="text-sm font-black text-slate-700 dark:text-slate-300">{user?.user_metadata?.display_name || user?.email}</p>
                         </div>
                         <button
-                            onClick={() => {
-                                if (window.confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
-                                    signOut();
-                                }
-                            }}
+                            onClick={handleLogoutClick}
                             className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all active:scale-90"
                             title="ออกจากระบบ"
                         >
@@ -264,20 +296,20 @@ const HomePage = () => {
                 {/* Hero / Controls */}
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
                     <div className="space-y-4 max-w-2xl">
-                        <h2 className="text-5xl font-black text-slate-800 dark:text-white leading-tight">
+                        <h2 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-white leading-tight">
                             ค้นหาและสร้าง <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">คู่มือแก้ไขปัญหา</span>
                         </h2>
-                        <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">
+                        <p className="text-sm md:text-lg text-slate-500 dark:text-slate-400 font-medium">
                             รวบรวมวิธีแก้ปัญหาทางเทคนิคของคุณไว้ที่เดียว เพื่อแบ่งปันให้กับคนในทีม
                         </p>
                     </div>
 
                     <button
                         onClick={() => { setSelectedManual(null); setShowForm(true); }}
-                        className="bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-black px-8 py-4 rounded-2xl shadow-2xl dark:shadow-indigo-900/20 flex items-center gap-2 transition-all active:scale-95 group flex-shrink-0"
+                        className="w-full sm:w-auto bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white font-black px-6 py-3 md:px-8 md:py-4 rounded-2xl shadow-xl dark:shadow-indigo-900/20 flex items-center justify-center gap-2 transition-all active:scale-95 group flex-shrink-0"
                     >
-                        <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+                        <Plus size={20} className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform duration-300" />
                         เริ่มสร้างคู่มือใหม่
                     </button>
                 </div>
@@ -294,12 +326,12 @@ const HomePage = () => {
                             className="w-full pl-12 pr-4 py-4 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-slate-600 dark:text-slate-300 bg-transparent"
                         />
                     </div>
-                    <div className="flex gap-2 p-2">
+                    <div className="flex gap-2 p-2 overflow-x-auto no-scrollbar pb-4 md:pb-2">
                         {['All', 'Network', 'Printer', 'Software', 'Hardware'].map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setCategoryFilter(cat)}
-                                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${categoryFilter === cat
+                                className={`flex-shrink-0 px-4 py-2 md:px-5 md:py-2 rounded-xl text-sm font-bold transition-all ${categoryFilter === cat
                                     ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-none'
                                     : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
                                     }`}
@@ -352,6 +384,16 @@ const HomePage = () => {
                     onClose={() => setViewingManual(null)}
                 />
             )}
+
+            <ConfirmationModal
+                isOpen={confirmation.isOpen}
+                onClose={() => setConfirmation(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={handleConfirmAction}
+                title={confirmation.title}
+                message={confirmation.message}
+                confirmText={confirmation.type === 'logout' ? 'ออกจากระบบ' : 'ลบข้อมูล'}
+                cancelText="ยกเลิก"
+            />
 
             <footer className="mt-20 py-10 border-t border-slate-200 dark:border-slate-800 text-center text-slate-400 text-sm">
                 <p>© 2026 IT Troubleshooting Guide Management System. Built with React & Supabase.</p>

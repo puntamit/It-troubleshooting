@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Shield, BookOpen, Users, Trash2, Edit3, UserCog, Search, AlertCircle, CheckCircle2, Home, Plus } from 'lucide-react';
 import ManualForm from '../components/manuals/ManualForm';
 import UserForm from '../components/users/UserForm';
+import ConfirmationModal from '../components/modals/ConfirmationModal';
 
 const AdminDashboard = () => {
     const { profile } = useAuth();
@@ -17,6 +18,14 @@ const AdminDashboard = () => {
     const [editingUser, setEditingUser] = useState(null);
     const [isAddingUser, setIsAddingUser] = useState(false);
     const [status, setStatus] = useState({ type: '', message: '' });
+    const [confirmation, setConfirmation] = useState({
+        isOpen: false,
+        type: '', // 'deleteManual' | 'deleteUser' | 'addUserWarning'
+        id: null,
+        data: null, // For passing extra data like userData
+        title: '',
+        message: ''
+    });
 
     useEffect(() => {
         fetchData();
@@ -60,8 +69,17 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleDeleteManual = async (id) => {
-        if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบคู่มือนี้? การกระทำนี้ไม่สามารถย้อนคืนได้')) return;
+    const handleDeleteManualClick = (id) => {
+        setConfirmation({
+            isOpen: true,
+            type: 'deleteManual',
+            id: id,
+            title: 'ลบคู่มือ',
+            message: 'คุณแน่ใจหรือไม่ว่าต้องการลบคู่มือนี้? การกระทำนี้ไม่สามารถย้อนคืนได้'
+        });
+    };
+
+    const executeDeleteManual = async (id) => {
 
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Delete timeout: Operation took too long')), 5000)
@@ -80,8 +98,17 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleDeleteUser = async (id) => {
-        if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้นี้? (การลบนี้จะลบเฉพาะข้อมูลโปรไฟล์ในแอป การลบบัญชีผู้ใช้ถาวรต้องทำผ่าน Supabase Dashboard)')) return;
+    const handleDeleteUserClick = (id) => {
+        setConfirmation({
+            isOpen: true,
+            type: 'deleteUser',
+            id: id,
+            title: 'ลบผู้ใช้งาน',
+            message: 'คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้นี้? (การลบนี้จะลบเฉพาะข้อมูลโปรไฟล์ในแอป การลบบัญชีผู้ใช้ถาวรต้องทำผ่าน Supabase Dashboard)'
+        });
+    };
+
+    const executeDeleteUser = async (id) => {
 
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Delete timeout: Operation took too long')), 5000)
@@ -183,45 +210,44 @@ const AdminDashboard = () => {
                 setStatus({ type: 'success', message: 'แก้ไขข้อมูลผู้ใช้สำเร็จ' });
             } else {
                 // Add new user (Note: This uses client-side signUp which has limitations)
-                // We'll interpret the email to generate a username if needed, or just warn the admin
-                // For this app context where email = username@internal.com, let's try to infer if they put a username or email
-                // But simplistically, let's just use what they gave.
-                // WARNING: Calling signUp here will change the current session to the new user!
-                // We must warn the admin.
                 if (!window.confirm('คำเตือน: การสร้างผู้ใช้ใหม่จะทำให้ "Admin ปัจจุบันถูก Logout" เนื่องจากข้อจำกัดของระบบ \n\nคุณต้องการดำเนินการต่อหรือไม่?')) {
                     return;
                 }
-
-                const { data, error } = await supabase.auth.signUp({
-                    email: userData.email,
-                    password: userData.password,
-                    options: {
-                        data: { display_name: userData.display_name }
-                    }
-                });
-
-                if (error) throw error;
-
-                // If successful (and maybe auto-logged in), we might be redirected or session changed.
-                // Assuming we want to optimistically update the UI before that happens or if it doesn't happen immediately:
-                if (data.user) {
-                    // We manually add to profiles list roughly, but actually the Trigger in Supabase usually creates the profile.
-                    // Here we'll just reload or wait.
-                    window.location.reload(); // Force reload to handle session change cleanly
-                }
+                await executeAddUser(userData);
             }
-
-            setEditingUser(null);
-            setIsAddingUser(false);
-            if (!userData.id) {
-                // If we added a user, we effectively logged out/switched, so forcing reload as above is best.
-            } else {
-                fetchData();
-            }
-
         } catch (err) {
             console.error('AdminDashboard: handleSaveUser failed:', err.message);
             setStatus({ type: 'error', message: 'บันทึกข้อมูลไม่สำเร็จ: ' + err.message });
+        }
+    };
+
+    const executeAddUser = async (userData) => {
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email: userData.email,
+                password: userData.password,
+                options: {
+                    data: { display_name: userData.display_name }
+                }
+            });
+
+            if (error) throw error;
+
+            if (data.user) {
+                window.location.reload();
+            }
+            setEditingUser(null);
+            setIsAddingUser(false);
+        } catch (err) {
+            throw err;
+        }
+    };
+
+    const handleConfirmAction = async () => {
+        if (confirmation.type === 'deleteManual') {
+            await executeDeleteManual(confirmation.id);
+        } else if (confirmation.type === 'deleteUser') {
+            await executeDeleteUser(confirmation.id);
         }
     };
 
@@ -242,7 +268,7 @@ const AdminDashboard = () => {
                         <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
                             <Shield size={24} />
                         </div>
-                        <h1 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Admin Console</h1>
+                        <h1 className="text-lg md:text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight hidden sm:block">Admin Console</h1>
                     </div>
                     <div className="flex items-center gap-4">
                         <Link
@@ -273,10 +299,10 @@ const AdminDashboard = () => {
 
                 {/* Tabs & Search */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                    <div className="flex bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm self-start">
+                    <div className="flex bg-white dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm self-start w-full md:w-auto overflow-x-auto">
                         <button
                             onClick={() => setActiveTab('manuals')}
-                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all ${activeTab === 'manuals' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'manuals' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <BookOpen size={18} />
@@ -284,7 +310,7 @@ const AdminDashboard = () => {
                         </button>
                         <button
                             onClick={() => setActiveTab('users')}
-                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all ${activeTab === 'users' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'users' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <Users size={18} />
@@ -296,7 +322,7 @@ const AdminDashboard = () => {
                         {activeTab === 'users' && (
                             <button
                                 onClick={() => setIsAddingUser(true)}
-                                className="flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all font-bold flex-shrink-0"
+                                className="flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all font-bold flex-shrink-0"
                             >
                                 <Plus size={20} />
                                 <span className="hidden sm:inline">เพิ่มผู้ใช้</span>
@@ -372,7 +398,7 @@ const AdminDashboard = () => {
                                                             <Edit3 size={18} />
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDeleteManual(manual.id)}
+                                                            onClick={() => handleDeleteManualClick(manual.id)}
                                                             className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
                                                         >
                                                             <Trash2 size={18} />
@@ -410,7 +436,7 @@ const AdminDashboard = () => {
                                                             <Edit3 size={16} />
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDeleteUser(p.id)}
+                                                            onClick={() => handleDeleteUserClick(p.id)}
                                                             className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
                                                             title="ลบผู้ใช้"
                                                         >

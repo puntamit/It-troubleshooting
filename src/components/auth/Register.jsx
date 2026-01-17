@@ -36,51 +36,51 @@ const Register = () => {
     };
 
     return (
-        <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
             <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl mx-auto mb-4 shadow-lg">
                     📚
                 </div>
-                <h2 className="text-2xl font-bold text-slate-800">สมัครสมาชิก</h2>
-                <p className="text-slate-500">เริ่มสร้างคู่มือแก้ไขปัญหาของคุณ</p>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">สมัครสมาชิก</h2>
+                <p className="text-slate-500 dark:text-slate-400">เริ่มสร้างคู่มือแก้ไขปัญหาของคุณ</p>
             </div>
 
             {error && (
-                <div className="bg-red-50 border border-red-100 text-red-600 p-3 rounded-lg text-sm mb-6">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-6">
                     {error}
                 </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">ชื่อผู้ใช้ (Username)</label>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">ชื่อผู้ใช้ (Username)</label>
                     <input
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                         placeholder="เลือกชื่อผู้ใช้ของคุณ"
                         required
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">รหัสผ่าน</label>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">รหัสผ่าน</label>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                         placeholder="••••••••"
                         required
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">ยืนยันรหัสผ่าน</label>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">ยืนยันรหัสผ่าน</label>
                     <input
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                         placeholder="••••••••"
                         required
                     />
@@ -94,7 +94,7 @@ const Register = () => {
                 </button>
             </form>
 
-            <div className="mt-8 text-center text-sm text-slate-600">
+            <div className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
                 มีบัญชีอยู่แล้ว?{' '}
                 <Link to="/login" className="text-indigo-600 font-bold hover:underline">
                     เข้าสู่ระบบ
