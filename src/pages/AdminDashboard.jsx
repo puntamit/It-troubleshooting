@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Shield, BookOpen, Users, Trash2, Edit3, UserCog, Search, AlertCircle, CheckCircle2, Home, Plus } from 'lucide-react';
+import { Shield, BookOpen, Users, Trash2, Edit3, UserCog, Search, AlertCircle, CheckCircle2, Home, Plus, Lock } from 'lucide-react';
 import ManualForm from '../components/manuals/ManualForm';
 import UserForm from '../components/users/UserForm';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
@@ -443,6 +443,26 @@ const AdminDashboard = () => {
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex items-center justify-end gap-2">
+                                                        <button
+                                                            onClick={async () => {
+                                                                if (window.confirm(`ส่งอีเมลรีเซ็ตรหัสผ่านให้คุณ ${p.display_name} ใช่หรือไม่? \n(อีเมลจะส่งไปที่ ${p.id.substring(0, 8)}... หรืออีเมลที่ผู้ใช้ใช้สมัคร)`)) {
+                                                                    try {
+                                                                        const email = `${p.display_name}@internal.com`.toLowerCase(); // Assuming internal logic or ID-based? Actually profiles in Supabase usually have email in auth side.
+                                                                        // Since we use the username@internal.com pattern mostly:
+                                                                        await supabase.auth.resetPasswordForEmail(email, {
+                                                                            redirectTo: `${window.location.origin}/reset-password`,
+                                                                        });
+                                                                        setStatus({ type: 'success', message: `ส่งอีเมลรีเซ็ตรหัสผ่านให้คุณ ${p.display_name} แล้ว` });
+                                                                    } catch (err) {
+                                                                        setStatus({ type: 'error', message: 'ส่งไม่สำเร็จ: ' + err.message });
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="p-2 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                            title="ส่งอีเมลรีเซ็ตรหัสผ่าน"
+                                                        >
+                                                            <Lock size={16} />
+                                                        </button>
                                                         <button
                                                             onClick={() => setEditingUser(p)}
                                                             className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"

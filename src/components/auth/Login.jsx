@@ -74,6 +74,31 @@ const Login = () => {
                 >
                     {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
                 </button>
+
+                <div className="text-right">
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            const emailInput = prompt('กรุณากรอกอีเมลที่ใช้สมัครสมาชิก (username@internal.com):');
+                            if (emailInput) {
+                                try {
+                                    setLoading(true);
+                                    await supabase.auth.resetPasswordForEmail(emailInput.toLowerCase(), {
+                                        redirectTo: `${window.location.origin}/reset-password`,
+                                    });
+                                    alert('ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว กรุณาเช็คใน Inbox ของคุณ');
+                                } catch (err) {
+                                    alert('เกิดข้อผิดพลาด: ' + err.message);
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }
+                        }}
+                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                    >
+                        ลืมรหัสผ่าน?
+                    </button>
+                </div>
             </form>
 
             <div className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">

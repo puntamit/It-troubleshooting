@@ -202,10 +202,30 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const resetPassword = async (email) => {
+        console.log('AuthContext: resetPassword called for:', email);
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        return data;
+    };
+
+    const updatePassword = async (newPassword) => {
+        console.log('AuthContext: updatePassword called');
+        const { data, error } = await supabase.auth.updateUser({
+            password: newPassword
+        });
+        if (error) throw error;
+        return data;
+    };
+
     const value = {
         signUp,
         signIn,
         signOut,
+        resetPassword,
+        updatePassword,
         user,
         profile,
         loading,
