@@ -124,7 +124,10 @@ const HomePage = () => {
                     const { error: stepsError } = await supabase
                         .from('steps')
                         .insert(manualData.steps.map(s => ({
-                            ...s,
+                            title: s.title,
+                            content: s.content,
+                            image_url: s.image_url,
+                            step_order: s.step_order,
                             manual_id: selectedManual.id
                         })));
 
@@ -149,7 +152,10 @@ const HomePage = () => {
                     const { error: stepsError } = await supabase
                         .from('steps')
                         .insert(manualData.steps.map(s => ({
-                            ...s,
+                            title: s.title,
+                            content: s.content,
+                            image_url: s.image_url,
+                            step_order: s.step_order,
                             manual_id: newManual.id
                         })));
 
@@ -264,7 +270,7 @@ const HomePage = () => {
 
                         <div className="text-right hidden lg:block mr-4">
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Logged in as</p>
-                            <p className="text-sm font-black text-slate-700 dark:text-slate-300">{user?.user_metadata?.display_name || user?.email}</p>
+                            <p className="text-sm font-black text-slate-700 dark:text-slate-300">{profile?.display_name || user?.email}</p>
                         </div>
                         <button
                             onClick={handleLogoutClick}

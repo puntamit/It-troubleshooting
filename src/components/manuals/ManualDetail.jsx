@@ -4,6 +4,31 @@ import { X, Clock, User, ChevronRight } from 'lucide-react';
 const ManualDetail = ({ manual, onClose }) => {
     if (!manual) return null;
 
+    const renderContentWithLinks = (text) => {
+        if (!text) return null;
+
+        // Regex to find URLs (starts with http:// or https://)
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+        return text.split(urlRegex).map((part, index) => {
+            if (part.match(urlRegex)) {
+                return (
+                    <a
+                        key={index}
+                        href={part}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 underline break-all relative z-10"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {part}
+                    </a>
+                );
+            }
+            return part;
+        });
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white dark:bg-slate-900 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 border dark:border-slate-800">
@@ -41,8 +66,8 @@ const ManualDetail = ({ manual, onClose }) => {
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-5 md:p-8 space-y-6 md:space-y-8">
                     <div className="prose prose-slate dark:prose-invert max-w-none">
-                        <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed italic border-l-4 border-indigo-200 dark:border-indigo-900 pl-4">
-                            {manual.description}
+                        <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed italic border-l-4 border-indigo-200 dark:border-indigo-900 pl-4 whitespace-pre-wrap">
+                            {renderContentWithLinks(manual.description)}
                         </p>
                     </div>
 
@@ -62,8 +87,8 @@ const ManualDetail = ({ manual, onClose }) => {
                                         <h4 className="font-bold text-slate-800 dark:text-white text-lg">
                                             {step.title}
                                         </h4>
-                                        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                                            {step.content}
+                                        <p className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">
+                                            {renderContentWithLinks(step.content)}
                                         </p>
                                         {step.image_url && (
                                             <div className="mt-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 max-w-md bg-white dark:bg-slate-900">

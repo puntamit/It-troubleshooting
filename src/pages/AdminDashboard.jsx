@@ -8,7 +8,7 @@ import UserForm from '../components/users/UserForm';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 
 const AdminDashboard = () => {
-    const { profile } = useAuth();
+    const { profile, user, refreshProfile } = useAuth();
     const [manuals, setManuals] = useState([]);
     const [profiles, setProfiles] = useState([]);
     const [activeTab, setActiveTab] = useState('manuals');
@@ -170,7 +170,13 @@ const AdminDashboard = () => {
                 await supabase.from('steps').delete().eq('manual_id', editingManual.id);
                 const { error: stepsError } = await supabase
                     .from('steps')
-                    .insert(stepData.map(s => ({ ...s, manual_id: editingManual.id })));
+                    .insert(stepData.map(s => ({
+                        title: s.title,
+                        content: s.content,
+                        image_url: s.image_url,
+                        step_order: s.step_order,
+                        manual_id: editingManual.id
+                    })));
 
                 if (stepsError) throw stepsError;
             })();
@@ -207,6 +213,15 @@ const AdminDashboard = () => {
                 if (error) throw error;
 
                 setProfiles(profiles.map(p => p.id === userData.id ? { ...p, ...userData } : p));
+
+                // If updating self, refresh global profile context AND update Auth Metadata
+                if (user && userData.id === user.id) {
+                    await supabase.auth.updateUser({
+                        data: { display_name: userData.display_name }
+                    });
+                    refreshProfile();
+                }
+
                 setStatus({ type: 'success', message: 'แก้ไขข้อมูลผู้ใช้สำเร็จ' });
             } else {
                 // Add new user (Note: This uses client-side signUp which has limitations)
