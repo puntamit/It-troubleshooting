@@ -83,8 +83,9 @@ const Login = () => {
                             if (emailInput) {
                                 try {
                                     setLoading(true);
+                                    const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
                                     await supabase.auth.resetPasswordForEmail(emailInput.toLowerCase(), {
-                                        redirectTo: `${window.location.origin}/reset-password`,
+                                        redirectTo: `${redirectUrl}/reset-password`,
                                     });
                                     alert('ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว กรุณาเช็คใน Inbox ของคุณ');
                                 } catch (err) {

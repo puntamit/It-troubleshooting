@@ -449,8 +449,9 @@ const AdminDashboard = () => {
                                                                     try {
                                                                         const email = `${p.display_name}@internal.com`.toLowerCase(); // Assuming internal logic or ID-based? Actually profiles in Supabase usually have email in auth side.
                                                                         // Since we use the username@internal.com pattern mostly:
+                                                                        const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
                                                                         await supabase.auth.resetPasswordForEmail(email, {
-                                                                            redirectTo: `${window.location.origin}/reset-password`,
+                                                                            redirectTo: `${redirectUrl}/reset-password`,
                                                                         });
                                                                         setStatus({ type: 'success', message: `ส่งอีเมลรีเซ็ตรหัสผ่านให้คุณ ${p.display_name} แล้ว` });
                                                                     } catch (err) {
