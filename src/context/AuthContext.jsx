@@ -212,9 +212,9 @@ export const AuthProvider = ({ children }) => {
 
     const resetPassword = async (email) => {
         console.log('AuthContext: resetPassword called for:', email);
-        const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
+        const baseUrl = (import.meta.env.VITE_REDIRECT_URL || window.location.origin).replace(/\/$/, '');
         const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${redirectUrl}/reset-password`,
+            redirectTo: `${baseUrl}/reset-password`,
         });
         if (error) throw error;
         return data;
