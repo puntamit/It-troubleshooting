@@ -186,19 +186,27 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signOut = async () => {
-        console.log('AuthContext: signOut called');
+        console.log('AuthContext: signOut starting...');
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('SignOut timeout')), 3000)
         );
 
         try {
-            await Promise.race([supabase.auth.signOut(), timeoutPromise]);
-            console.log('AuthContext: signOut success');
-        } catch (error) {
-            console.warn('AuthContext: signOut failed or timed out:', error.message);
-            // Even if it fails, we clear local state to "force" logout in the UI
+            // Force clear local state FIRST so UI responds immediately
             setUser(null);
             setProfile(null);
+            console.log('AuthContext: Local state cleared (force)');
+
+            console.log('AuthContext: Sending signOut request to Supabase...');
+            await Promise.race([supabase.auth.signOut(), timeoutPromise]);
+            console.log('AuthContext: Supabase signOut responded (or timed out)');
+        } catch (error) {
+            console.warn('AuthContext: signOut API call failed:', error.message);
+        } finally {
+            // Ensure state is cleared no matter what happened in the try block
+            setUser(null);
+            setProfile(null);
+            console.log('AuthContext: signOut complete (State ensured null)');
         }
     };
 
